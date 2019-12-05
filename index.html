@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <title>Evaluation vue js</title>
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    </head>
+    <body>
+        <div id="app">
+            <div v-html='h1'></div>
+            <div v-html='date'></div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Designation</th>
+                        <th>Qte</th>
+                        <th>Pu Ht</th>
+                        <th>Tva</th>
+                        <th>P Ht</th>
+                        <th>P Ttc</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr @keyup.enter="ajout_element" v-for='value in table' :key='value.id'>
+                        <td>{{value.id}}</td>
+                        <td><input type="text" v-model="value.designation"></td>
+                        <td><input @input="update(value)" type="number" min="0" v-model="value.qte"></td>
+                        <td><input min="0" @input="update(value)" type="number" v-model="value.pu_ht"></td>
+                        <td><input @input="update(value)" type="number" max="100" min="0" v-model="value.tva"></td>
+                        <td>{{value.p_ht}}€</td>
+                        <td>{{value.p_ttc}}€</td>
+                        <td><button @click="_delete(value)"><img src="img/trash.svg" alt="supprimer"></button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div><h2>Total HT : {{get_tot_ht}} €</h2></div>
+            <div><h2>Total TTC : {{get_tot_ttc}} €</h2></div><br>
+
+            <div><button @click.prevent="ajout_element" >+ Ajouter une ligne</button></div><br>
+
+            <div>Debug {{ table }}</div>
+
+        </div>
+        <script>
+
+            var app = new Vue({
+                el: '#app',
+                data: function (){
+                    return {
+                        table: [],
+                        id: 0,
+                        h1:'<h1>Evaluation VueJs</h1>',
+                        date: '<h2>Facture du 5 Décembre 2019<h2>',
+                        apiUri: "http://localhost:3000/"
+                    };
+                },
+
+                methods : {
+                    ajout_element : function (){
+                        this.table.push({'id': this.id++,'designation': '','qte': '','pu_ht':'','tva':'','p_ht':'0','p_ttc':'0' });
+                        this.$nextTick(() => {
+                            if (this.table.length != 0) 
+                                document.getElementsByTagName('tr')[this.table.length].getElementsByTagName('input')[0].focus();
+                        });
+                    },
+
+                    _delete: function(value){
+                        this.table.splice(this.table.indexOf(value),1);
+                    },
+
+                    update: function(value){
+                        if (value.pu_ht > 0 && value.qte && value.tva >= 0 && value.tva <= 100){
+                            value.p_ht = eval(value.pu_ht*value.qte).toFixed(2);
+                            value.p_ttc = eval((value.pu_ht*value.qte)+(value.pu_ht*value.qte)*value.tva/100).toFixed(2);
+                        }
+                    }
+                },
+
+                watch : {
+                    table : {
+                        handler : function(){
+                            localStorage.setItem('monLocal',JSON.stringify(this.table));
+                            localStorage.setItem('my_id',this.id);
+                        },
+                        deep: true,
+                    }
+                },
+
+                mounted(){
+                    let json = JSON.parse(localStorage.getItem('monLocal'));
+                    if ( json != null)
+                        this.table = json;
+                    let id = localStorage.getItem('my_id');
+                    if ( id != null)
+                        this.id = id;
+                },
+
+                computed: {
+                    get_tot_ht: function (){
+                        let tot_ht = 0;
+                        this.table.forEach( (element) =>{
+                            tot_ht += parseFloat(element.p_ht);
+                        });
+                        return tot_ht.toFixed(2);
+                    },
+
+                    get_tot_ttc: function (){
+                        let tot_ttc = 0;
+                        this.table.forEach( (element) =>{
+                            tot_ttc += parseFloat(element.p_ttc);
+                        });
+                        return tot_ttc.toFixed(2);
+                    },
+                }
+            });
+        </script>
+    </body>
+</html>
