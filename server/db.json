@@ -1,27 +1,20 @@
 {
   "factures": [
     {
-      "id": 3,
-      "designation": "eaf",
-      "qte": "4",
-      "pu_ht": "33",
-      "p_ht": "132.00",
-      "p_ttc": "133.32",
-      "tva": "1"
+      "id": 1,
+      "designation": "dsfsq",
+      "qte": "1",
+      "pu_ht": "4",
+      "p_ht": "4.00",
+      "p_ttc": "4.00",
+      "tva": ""
     },
     {
-      "id": 4
-    },
-    {
-      "id": 5
-    },
-    {
-      "id": 6
-    },
-    {
-      "id": 7,
-      "designation": "gaeg",
-      "qte": "45"
+      "id": 6,
+      "qte": "45",
+      "pu_ht": "2",
+      "p_ht": "90.00",
+      "p_ttc": "90.00"
     }
   ]
 }
